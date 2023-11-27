@@ -1,14 +1,25 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
-contract Counter {
-    uint256 public number;
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-    function setNumber(uint256 newNumber) public {
+import { UD60x18, ud } from "@prb/math/src/UD60x18.sol";
+
+contract Counter is OwnableUpgradeable, UUPSUpgradeable {
+    UD60x18 number = ud(0);
+
+    function initialize() public initializer {
+        __Ownable_init_unchained(msg.sender);
+    }
+
+    function setNumber(UD60x18 newNumber) public {
         number = newNumber;
     }
 
     function increment() public {
-        number++;
+        number = number.add(ud(1));
     }
+
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 }
